@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# name: TB Discourse SEO
+# name: tb-discourse-seo
 # about: Adds X-Robots-Tag: noindex header to topics from specific categories
 # version: 0.1.0
 # authors: Mobilon
