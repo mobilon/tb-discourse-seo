@@ -1,4 +1,5 @@
 import Component from "@glimmer/component";
+import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import { tracked } from "@glimmer/tracking";
 
@@ -7,14 +8,31 @@ export default class NoindexTopicsSettings extends Component {
 
   constructor(owner, args) {
     super(owner, args);
-    const value = this.args.outletArgs?.transientData?.custom_fields?.noindex_topics;
+    const outletArgs = this.args.outletArgs || {};
+    const value =
+      outletArgs.transientData?.custom_fields?.noindex_topics ??
+      outletArgs.category?.custom_fields?.noindex_topics;
     this.checked = value === true || value === "true";
   }
 
   @action
   toggleNoindex(event) {
     this.checked = event.target.checked;
-    this.args.outletArgs?.form?.set("custom_fields.noindex_topics", this.checked);
+    const outletArgs = this.args.outletArgs || {};
+
+    // New FormKit-based category form.
+    if (outletArgs.form?.set) {
+      outletArgs.form.set("custom_fields.noindex_topics", this.checked);
+      return;
+    }
+
+    // Legacy category edit form.
+    const category = outletArgs.category;
+    if (category?.set) {
+      const customFields = Object.assign({}, category.custom_fields);
+      customFields.noindex_topics = this.checked;
+      category.set("custom_fields", customFields);
+    }
   }
 
   <template>
