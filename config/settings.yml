@@ -1,0 +1,4 @@
+plugins:
+  tb_discourse_seo_enabled:
+    default: true
+    client: true
