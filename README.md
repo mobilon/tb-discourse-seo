@@ -14,7 +14,7 @@ A [Discourse](https://www.discourse.org/) plugin that adds the `X-Robots-Tag: no
    X-Robots-Tag: noindex
    ```
 
-3. **Subcategory Inheritance** — If a parent category has the noindex setting enabled, all topics in its subcategories will also receive the `noindex` header, even if the subcategory itself doesn't have the setting checked.
+3. **Per-category only** — The setting applies strictly to topics whose category has the box checked. Subcategories do **not** inherit the parent's setting; enable it on each category you want to deindex.
 
 ## Installation
 
@@ -41,7 +41,7 @@ Then rebuild the container:
 2. In the **General** tab, check the box **"Add the tag Noindex in topics from this category"**.
 3. Save the category.
 
-All topics in that category (and its subcategories) will now return `X-Robots-Tag: noindex`, signaling search engines not to index those pages.
+All topics in that category will now return `X-Robots-Tag: noindex`, signaling search engines not to index those pages.
 
 ## Configuration
 

@@ -41,12 +41,12 @@ after_initialize do
     end
 
     def tb_seo_category_noindex?(category_id)
-      category = Category.find_by(id: category_id)
-      return false unless category
-      return true if category.custom_fields["noindex_topics"].to_s == "true"
-      return false unless category.parent_category_id
+      value = CategoryCustomField.where(
+        category_id: category_id,
+        name: "noindex_topics"
+      ).pick(:value)
 
-      tb_seo_category_noindex?(category.parent_category_id)
+      %w[true t 1].include?(value.to_s.downcase)
     end
   end
 end
