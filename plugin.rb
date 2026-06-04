@@ -11,31 +11,42 @@ enabled_site_setting :tb_discourse_seo_enabled
 after_initialize do
   register_category_custom_field_type :noindex_topics, :boolean
 
-  add_to_serializer(:basic_category, :noindex_topics) { object.custom_fields["noindex_topics"] }
-  add_to_serializer(:basic_category, :include_noindex_topics?) { true }
+  # Make sure the custom field is preloaded whenever categories are listed
+  # (the Site bootstrap serializes every category on almost every request).
+  Site.preloaded_category_custom_fields << "noindex_topics" if Site.respond_to?(:preloaded_category_custom_fields)
+
+  add_to_serializer(:basic_category, :noindex_topics) do
+    object.custom_fields["noindex_topics"]
+  end
+
   ::TopicsController.class_eval do
-    after_action :add_noindex_header, only: :show
+    before_action :add_noindex_header, only: :show
 
     private
 
     def add_noindex_header
       return unless SiteSetting.tb_discourse_seo_enabled?
 
-      topic = @topic_view&.topic
-      return unless topic&.category
+      topic_id = params[:topic_id].presence || params[:id].presence
+      return if topic_id.blank?
 
-      category = topic.category
-      if category_noindex?(category)
+      category_id = Topic.where(id: topic_id).pick(:category_id)
+      return if category_id.blank?
+
+      if tb_seo_category_noindex?(category_id)
         response.headers["X-Robots-Tag"] = "noindex"
       end
+    rescue => e
+      Rails.logger.warn("[tb-discourse-seo] failed to set noindex header: #{e.message}")
     end
 
-    def category_noindex?(category)
+    def tb_seo_category_noindex?(category_id)
+      category = Category.find_by(id: category_id)
+      return false unless category
       return true if category.custom_fields["noindex_topics"].to_s == "true"
       return false unless category.parent_category_id
 
-      parent = Category.find_by(id: category.parent_category_id)
-      parent && category_noindex?(parent)
+      tb_seo_category_noindex?(category.parent_category_id)
     end
   end
 end
