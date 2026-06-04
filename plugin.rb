@@ -8,12 +8,11 @@
 
 enabled_site_setting :tb_discourse_seo_enabled
 
-register_category_custom_field_type :noindex_topics, :boolean
-
-add_to_serializer(:basic_category, :noindex_topics) { object.custom_fields["noindex_topics"] }
-add_to_serializer(:basic_category, :include_noindex_topics?) { true }
-
 after_initialize do
+  register_category_custom_field_type :noindex_topics, :boolean
+
+  add_to_serializer(:basic_category, :noindex_topics) { object.custom_fields["noindex_topics"] }
+  add_to_serializer(:basic_category, :include_noindex_topics?) { true }
   ::TopicsController.class_eval do
     after_action :add_noindex_header, only: :show
 
