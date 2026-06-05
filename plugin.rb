@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# name: tb-discourse-seo
-# about: Adds X-Robots-Tag: noindex header to topics from specific categories
+# name: TB-Discourse-Seo
+# about: Adds "X-Robots-Tag: noindex" header to topics from specific categories
 # version: 0.1.0
-# authors: Mobilon
+# authors: Thiago Mobilon
 # url: https://github.com/mobilon/tb-discourse-seo
 
 enabled_site_setting :tb_discourse_seo_enabled

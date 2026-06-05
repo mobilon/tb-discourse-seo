@@ -18,7 +18,7 @@ A [Discourse](https://www.discourse.org/) plugin that adds the `X-Robots-Tag: no
 
 ## Installation
 
-Follow the [official Discourse plugin installation guide](https://meta.discourse.org/t/install-a-plugin/191389) and add this plugin to your `app.yml`:
+Follow the official Discourse plugin installation guide and add this plugin to your `app.yml`:
 
 ```yaml
 hooks:
