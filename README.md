@@ -26,7 +26,7 @@ hooks:
     - exec:
         cd: /var/www/discourse
         cmd:
-          - git clone https://github.com/mobilon/tb-discourse-seo.git plugins/tb-discourse-seo
+          - git clone https://github.com/mobilon/tb-discourse-seo.git
 ```
 
 Then rebuild the container:
