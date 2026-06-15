@@ -1,0 +1,4 @@
+en:
+  site_settings:
+    tb_discourse_seo_enabled: "Enable the TB Discourse SEO plugin."
+    tb_discourse_seo_hreflang_enabled: "Add hreflang annotations to the &lt;head&gt; of topics that have translated versions (based on Discourse content localization). Requires <code>content_localization_enabled</code> and <code>set_locale_from_param</code>."

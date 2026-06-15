@@ -2,3 +2,6 @@ plugins:
   tb_discourse_seo_enabled:
     default: true
     client: true
+  tb_discourse_seo_hreflang_enabled:
+    default: true
+    client: false
