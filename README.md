@@ -4,6 +4,7 @@ A [Discourse](https://www.discourse.org/) plugin with two SEO features:
 
 1. **Noindex per category** — adds the `X-Robots-Tag: noindex` HTTP header to topics belonging to specific categories, preventing search engines (like Google) from indexing those pages.
 2. **hreflang for translated topics** — injects `<link rel="alternate" hreflang="...">` tags into the `<head>` of topic pages that have translations, so search engines can discover and serve the correct language version of each topic.
+3. **Noindex for tag pages** — adds the `X-Robots-Tag: noindex` HTTP header to all tag listing pages (`/tags` and `/tag/:tag`), preventing search engines from indexing them.
 
 ---
 
@@ -72,6 +73,24 @@ For the translated `?tl=<locale>` URLs to actually serve translated content to s
 
 ---
 
+## Feature 3 — Noindex for tag pages
+
+### How It Works
+
+When enabled, the plugin adds the following HTTP header to every tag listing page (`/tags` directory and individual `/tag/:tag` pages, including all filter variants like `/tag/:tag/l/new`, `/tag/:tag/l/top`, etc.):
+
+```
+X-Robots-Tag: noindex
+```
+
+This signals search engines not to index tag pages, which are often low-value for SEO (thin content, duplicate topic listings).
+
+### Usage
+
+Go to **Admin > Settings > TB Discourse SEO** and enable **`tb_discourse_seo_noindex_tags_enabled`**.
+
+---
+
 ## Installation
 
 Follow the official Discourse plugin installation guide and add this plugin to your `app.yml`:
@@ -97,6 +116,7 @@ Then rebuild the container:
 |---------|---------|-------------|
 | `tb_discourse_seo_enabled` | `true` | Enable or disable the plugin globally |
 | `tb_discourse_seo_hreflang_enabled` | `true` | Enable or disable the hreflang feature |
+| `tb_discourse_seo_noindex_tags_enabled` | `false` | Add `X-Robots-Tag: noindex` to all tag listing pages (`/tags` and `/tag/:tag`) |
 
 ## License
 

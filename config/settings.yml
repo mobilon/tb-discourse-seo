@@ -5,3 +5,6 @@ plugins:
   tb_discourse_seo_hreflang_enabled:
     default: true
     client: false
+  tb_discourse_seo_noindex_tags_enabled:
+    default: false
+    client: false

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # name: TB-Discourse-Seo
-# about: SEO helpers for Discourse: noindex per category and hreflang tags for translated topics
+# about: SEO helpers for Discourse: noindex per category, noindex for tag pages and hreflang tags for translated topics
 # version: 0.2.0
 # authors: Thiago Mobilon
 # url: https://github.com/mobilon/tb-discourse-seo
@@ -129,6 +129,22 @@ after_initialize do
 
   register_html_builder("server:before-head-close-crawler") do |controller|
     ::TbDiscourseSeo::Hreflang.render_for_controller(controller)
+  end
+
+  ::TagsController.class_eval do
+    before_action :add_noindex_tags_header
+
+    private
+
+    def add_noindex_tags_header
+      return unless SiteSetting.tb_discourse_seo_enabled?
+      return unless SiteSetting.tb_discourse_seo_noindex_tags_enabled?
+      return unless action_name == "index" || action_name.start_with?("show")
+
+      response.headers["X-Robots-Tag"] = "noindex"
+    rescue => e
+      Rails.logger.warn("[tb-discourse-seo] failed to set noindex header on tag page: #{e.message}")
+    end
   end
 
   ::TopicsController.class_eval do
