@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # name: TB-Discourse-Seo
-# about: SEO helpers for Discourse: noindex per category, noindex for tag pages and hreflang tags for translated topics
+# about: SEO helpers for Discourse: noindex per category, noindex for tag pages, noindex for user profiles and hreflang tags for translated topics
 # version: 0.2.0
 # authors: Thiago Mobilon
 # url: https://github.com/mobilon/tb-discourse-seo
@@ -108,6 +108,31 @@ module ::TbDiscourseSeo
       ""
     end
   end
+
+  # Suppresses the <link rel="canonical"> tag on user profile pages when the
+  # noindex_user_profiles setting is enabled, so search engines receive a
+  # clean noindex signal without a conflicting canonical reference.
+  module CanonicalOverride
+    USER_PROFILE_ACTIONS = %w[show summary badges bookmarks].freeze
+
+    def canonical_link_tag(url = nil)
+      return "".html_safe if suppress_user_profile_canonical?(url)
+      super
+    end
+
+    def suppress_user_profile_canonical?(url)
+      return false unless url.nil?
+      return false unless SiteSetting.tb_discourse_seo_enabled?
+      return false unless SiteSetting.tb_discourse_seo_noindex_user_profiles_enabled?
+
+      ctrl = controller
+      return false unless ctrl
+
+      ctrl.controller_name == "users" && USER_PROFILE_ACTIONS.include?(ctrl.action_name)
+    rescue StandardError
+      false
+    end
+  end
 end
 
 after_initialize do
@@ -146,6 +171,25 @@ after_initialize do
       Rails.logger.warn("[tb-discourse-seo] failed to set noindex header on tag page: #{e.message}")
     end
   end
+
+  ::UsersController.class_eval do
+    before_action :add_noindex_user_profile_header, only: %i[show summary badges bookmarks]
+
+    private
+
+    def add_noindex_user_profile_header
+      return unless SiteSetting.tb_discourse_seo_enabled?
+      return unless SiteSetting.tb_discourse_seo_noindex_user_profiles_enabled?
+
+      response.headers["X-Robots-Tag"] = "noindex"
+    rescue => e
+      Rails.logger.warn("[tb-discourse-seo] failed to set noindex header on user profile page: #{e.message}")
+    end
+  end
+
+  # Suppress the <link rel="canonical"> tag on user profile pages when the
+  # noindex_user_profiles setting is enabled.
+  ::CanonicalURL::Helpers.prepend(::TbDiscourseSeo::CanonicalOverride)
 
   ::TopicsController.class_eval do
     before_action :add_noindex_header, only: :show

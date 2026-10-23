@@ -5,6 +5,7 @@ A [Discourse](https://www.discourse.org/) plugin with two SEO features:
 1. **Noindex per category** — adds the `X-Robots-Tag: noindex` HTTP header to topics belonging to specific categories, preventing search engines (like Google) from indexing those pages.
 2. **hreflang for translated topics** — injects `<link rel="alternate" hreflang="...">` tags into the `<head>` of topic pages that have translations, so search engines can discover and serve the correct language version of each topic.
 3. **Noindex for tag pages** — adds the `X-Robots-Tag: noindex` HTTP header to all tag listing pages (`/tags` and `/tag/:tag`), preventing search engines from indexing them.
+4. **Noindex for user profiles** — adds the `X-Robots-Tag: noindex` HTTP header to all user profile pages (`/u/:username` and sub-pages), preventing search engines from indexing them.
 
 ---
 
@@ -91,6 +92,23 @@ Go to **Admin > Settings > TB Discourse SEO** and enable **`tb_discourse_seo_noi
 
 ---
 
+## Feature 4 — Noindex for user profiles
+
+### How It Works
+
+When enabled, the plugin:
+
+1. Adds the `X-Robots-Tag: noindex` HTTP header to all user profile pages (`/u/:username` and sub-pages such as `/u/:username/activity`, `/u/:username/summary`, `/u/:username/badges`, `/u/:username/bookmarks`).
+2. **Removes the `<link rel="canonical">` tag** from these pages.
+
+The canonical tag is removed because Discourse points it to `/u/:username`, a URL that does not actually exist — it 301-redirects to `/u/:username/summary`. This creates thousands of non-existent canonical URLs that Google tries to crawl, wasting crawl budget on redirects that lead nowhere. Removing the canonical tag alongside the noindex header gives search engines a clean, unambiguous signal to skip these pages entirely.
+
+### Usage
+
+Go to **Admin > Settings > TB Discourse SEO** and enable **`tb_discourse_seo_noindex_user_profiles_enabled`**.
+
+---
+
 ## Installation
 
 Follow the official Discourse plugin installation guide and add this plugin to your `app.yml`:
@@ -117,6 +135,7 @@ Then rebuild the container:
 | `tb_discourse_seo_enabled` | `true` | Enable or disable the plugin globally |
 | `tb_discourse_seo_hreflang_enabled` | `true` | Enable or disable the hreflang feature |
 | `tb_discourse_seo_noindex_tags_enabled` | `false` | Add `X-Robots-Tag: noindex` to all tag listing pages (`/tags` and `/tag/:tag`) |
+| `tb_discourse_seo_noindex_user_profiles_enabled` | `false` | Add `X-Robots-Tag: noindex` to all user profile pages (`/u/:username` and sub-pages) and remove the canonical tag |
 
 ## License
 
